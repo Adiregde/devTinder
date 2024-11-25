@@ -1,24 +1,29 @@
-
 const express = require('express');
 
 const app = express();
 
-app.get("/user",(req,res)=>{
-    res.send({firstName: "Aditya", lastName: "Regde"});
-})
+const { adminAuth, userAuth } = require("./middlewares/auth.js");
 
-app.post("/user", (req,res)=>{
-    res.send('Data Successfully saved the database');
+app.use("/admin", adminAuth);
+
+app.get("/user", userAuth, (req,res)=>{
+    res.send('User data sent');
 });
 
-app.delete("/user", (req,res)=>{
-    res.send('Data deleted successfully');
+app.post("/user/login", (req,res)=>{
+    res.send('User Logined successful');
 });
 
-app.use("/test",(req,res)=>{
-    res.send('hello wokring on test');
-})
+app.get("/user/data", userAuth , (req,res)=>{
+    res.send('USer sent the data');
+});
 
+app.use("/user",(req,res,next)=>{
+    res.send('route handel one');
+    next();
+}, (req,res)=>{
+    res.send('router handel 2');
+});
 
 app.listen(3006, ()=>{
     console.log('hello welcoem to 3006');    
