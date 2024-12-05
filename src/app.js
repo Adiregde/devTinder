@@ -1,30 +1,36 @@
 const express = require('express');
-
+const connectDB = require("./config/database.js");
 const app = express();
+const User = require("./models/user.js");
 
-const { adminAuth, userAuth } = require("./middlewares/auth.js");
+app.post("/signup", async (req,res) => {
 
-app.use("/admin", adminAuth);
+    //creating a new instance of the USer model
+    const user = new User({
+        firstName: "Deepak",
+        lastName: "Agarwal",
+        emailId: "depkagarwl@gamil.com",
+        password: "deepak123",
+        age: 24,
+        gender: "Male"
+    });
 
-app.get("/user", userAuth, (req,res)=>{
-    res.send('User data sent');
+    try {
+        await user.save();
+        res.send("Data is getting stored in the database");
+    } catch (error) {
+        res.status(400).send("USer data is not getting stored");
+    }
 });
 
-app.post("/user/login", (req,res)=>{
-    res.send('User Logined successful');
-});
 
-app.get("/user/data", userAuth , (req,res)=>{
-    res.send('USer sent the data');
-});
-
-app.use("/user",(req,res,next)=>{
-    res.send('route handel one');
-    next();
-}, (req,res)=>{
-    res.send('router handel 2');
-});
-
-app.listen(3006, ()=>{
-    console.log('hello welcoem to 3006');    
+connectDB()
+.then(() => {
+    console.log("database connected success....");
+    app.listen(3000, ()=>{
+        console.log('Server is connected to the port 7777');    
+    });
+})
+.catch((err)=>{
+    console.log("database cannot connect. Please check the connection");  
 });
